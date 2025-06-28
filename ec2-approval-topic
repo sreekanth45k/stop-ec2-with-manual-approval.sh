@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# === CONFIGURATION ===
+INSTANCE_ID="i-0c94b2892a655e01e"
+REGION="ap-south-1"
+SNS_TOPIC_ARN="arn:aws:sns:ap-south-1:856380560704:ec2-approval-topic"
+
+# === STEP 1: Send email via SNS ===
+MESSAGE="🛑 Request to stop EC2 instance: $INSTANCE_ID
+
+Please respond to this message with 'yes' or 'no' in the approval system."
+echo "📤 Sending approval email..."
+aws sns publish \
+  --region "$REGION" \
+  --topic-arn "$SNS_TOPIC_ARN" \
+  --subject "Approval Needed: Stop EC2 instance $INSTANCE_ID" \
+  --message "$MESSAGE"
+
+# === STEP 2: Wait for user input ===
+echo "⏳ Waiting for developer approval..."
+read -p "Type 'yes' to stop EC2 or 'no' to keep it running: " APPROVAL
+
+APPROVAL=$(echo "$APPROVAL" | tr '[:upper:]' '[:lower:]' | xargs)
+
+if [[ "$APPROVAL" == "yes" ]]; then
+    echo "✅ Approval received. Stopping instance..."
+    aws ec2 stop-instances --instance-ids "$INSTANCE_ID" --region "$REGION"
+    echo "✅ EC2 instance $INSTANCE_ID stopped."
+elif [[ "$APPROVAL" == "no" ]]; then
+    echo "❌ Denied. EC2 instance will continue running."
+else
+    echo "⚠️ Invalid input: '$APPROVAL'. Exiting without action."
+fi
