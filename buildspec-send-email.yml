@@ -1,3 +1,4 @@
+
 version: 0.2
 
 phases:
@@ -9,5 +10,4 @@ phases:
           --topic-arn arn:aws:sns:ap-south-1:856380560704:ec2-approval-topic \
           --region ap-south-1 \
           --subject "Approval Required to Stop EC2 Instance" \
-          --message "Please confirm whether to stop EC2 instance i-0c94b2892a655e01e.
-Respond 'yes' or 'no' via input to the second build job or communicate approval to DevOps."
+          --message "Please confirm whether to stop EC2 instance i-0c94b2892a655e01e. Respond 'yes' or 'no' manually or via input to the next pipeline step."
