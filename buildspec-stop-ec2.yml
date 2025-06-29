@@ -3,18 +3,11 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo "🛠 Reading developer approval..."
-
-      # Use environment variable APPROVAL (from CodeBuild input)
-      - APPROVAL=${APPROVAL:-no}
-      - APPROVAL=$(echo "$APPROVAL" | tr '[:upper:]' '[:lower:]' | xargs)
-
+      - echo "Checking approval..."
       - |
-        if [[ "$APPROVAL" == "yes" ]]; then
-          echo "✅ Approval received. Stopping EC2..."
+        if [ "$APPROVAL" == "yes" ]; then
+          echo "Stopping EC2 instance..."
           aws ec2 stop-instances --instance-ids i-0c94b2892a655e01e --region ap-south-1
-        elif [[ "$APPROVAL" == "no" ]]; then
-          echo "❌ Approval denied. EC2 will remain running."
         else
-          echo "⚠️ Invalid or missing approval input: '$APPROVAL'."
+          echo "Approval denied. EC2 will continue running."
         fi
